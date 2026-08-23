@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Remote & Direct Print Management',
+    'name': 'Direct Print Pro - Silent, Auto & Remote Print without Cloud or IoT Box',
     'version': '18.0.2.0.0',
     'category': 'Extra Tools',
     'summary': 'Fast, Silent & Zero-Cloud Direct Print Management for Physical & Remote Printers',
