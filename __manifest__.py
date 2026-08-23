@@ -1,0 +1,43 @@
+# -*- coding: utf-8 -*-
+{
+    'name': 'Remote & Direct Print Management',
+    'version': '18.0.2.0.0',
+    'category': 'Extra Tools',
+    'summary': 'Fast, Silent & Zero-Cloud Direct Print Management for Physical & Remote Printers',
+    'author': 'Nguyen Phuc Dinh',
+    'website': 'https://github.com/dinhnguyen888',
+    'support': 'nguyenphucdinh.hosting@gmail.com',
+    'price': 20.00,
+    'currency': 'USD',
+    'license': 'OPL-1',
+    'application': True,
+    'installable': True,
+    'images': ['static/description/icon.png'],
+    'depends': ['base_setup', 'web', 'mail'],
+    'data': [
+        'security/ir.model.access.csv',
+        'views/printer_details_views.xml',
+        'views/printer_node_views.xml',
+        'views/ir_attachment_views.xml',
+        'views/printer_agent_token_views.xml',
+        'views/res_groups_views.xml',
+        'views/res_config_settings_views.xml',
+        'views/ir_actions_report.xml',
+        'views/direct_printer_dashboard_views.xml',
+        'views/menu_view.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'remote_print_management/static/src/js/print_registry.js',
+            'remote_print_management/static/src/js/open_direct_printer.js',
+            'remote_print_management/static/src/js/direct_printer_dashboard.js',
+            'remote_print_management/static/src/js/dropzone_binary_field.js',
+            'remote_print_management/static/src/scss/direct_printer_dashboard.scss',
+            'remote_print_management/static/src/scss/dropzone_binary.scss',
+            'remote_print_management/static/src/xml/direct_printer_dashboard.xml',
+            'remote_print_management/static/src/xml/open_direct_printer.xml',
+            'remote_print_management/static/src/xml/dropzone_binary_field.xml',
+        ],
+    },
+}
+

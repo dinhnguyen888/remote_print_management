@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Node Form View -->
+    <record id="printer_node_view_form" model="ir.ui.view">
+        <field name="name">printer.node.form</field>
+        <field name="model">printer.node</field>
+        <field name="arch" type="xml">
+            <form string="Printer Node" create="false">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="online,offline"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(printer_details_action)d"
+                                type="action"
+                                class="oe_stat_button"
+                                icon="fa-print"
+                                context="{'search_default_client_id': client_id}">
+                            <div class="o_stat_info">
+                                <field name="printer_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Printers</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Node Name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Node Specification">
+                            <field name="client_id" readonly="1"/>
+                            <field name="ip_address" readonly="1"/>
+                            <field name="os_info" readonly="1"/>
+                            <field name="agent_version" readonly="1"/>
+                        </group>
+                        <group string="System Info">
+                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                            <field name="last_seen" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Connected Printers" name="printers">
+                            <field name="printer_ids" readonly="1">
+                                <list create="false" edit="false" delete="false">
+                                    <field name="printers_name"/>
+                                    <field name="id_of_printer"/>
+                                    <field name="windows_printer_name"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'online'"
+                                           decoration-danger="state in ('offline', 'error')"
+                                           decoration-warning="state in ('paper_out', 'paper_jam', 'door_open')"/>
+                                    <field name="last_seen"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Node List View -->
+    <record id="printer_node_view_tree" model="ir.ui.view">
+        <field name="name">printer.node.list</field>
+        <field name="model">printer.node</field>
+        <field name="arch" type="xml">
+            <list string="Printer Agent Nodes" create="false">
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="ip_address"/>
+                <field name="os_info"/>
+                <field name="agent_version"/>
+                <field name="printer_count" string="Printers"/>
+                <field name="last_seen"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'online'"
+                       decoration-danger="state == 'offline'"
+                       decoration-muted="state == 'unknown'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Node Search View -->
+    <record id="printer_node_view_search" model="ir.ui.view">
+        <field name="name">printer.node.search</field>
+        <field name="model">printer.node</field>
+        <field name="arch" type="xml">
+            <search string="Search Nodes">
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="ip_address"/>
+                <field name="os_info"/>
+                <filter string="Online" name="filter_online" domain="[('state', '=', 'online')]"/>
+                <filter string="Offline" name="filter_offline" domain="[('state', '=', 'offline')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Company" name="group_company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Node Window Action -->
+    <record id="printer_node_action" model="ir.actions.act_window">
+        <field name="name">Agent Nodes</field>
+        <field name="res_model">printer.node</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="printer_node_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Printer Agent Node found.
+            </p>
+            <p>
+                Agent Nodes are automatically registered when a Printer Agent connects to Odoo.
+            </p>
+        </field>
+    </record>
+
+</odoo>

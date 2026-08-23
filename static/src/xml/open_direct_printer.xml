@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="remote_print_management.OpenDirectPrinterDialog" t-inherit="web.Dialog" t-inherit-mode="primary">
+        <xpath expr="//*[hasclass('modal-body')]" position="replace">
+            <main class="modal-body" t-att-class="props.bodyClass">
+                <div class="o_remote_print_management">
+                    <t t-if="state.loading">
+                        <div class="p-4 text-center text-muted">Loading printers...</div>
+                    </t>
+                    <t t-else="">
+                        <div class="row g-3">
+                            <div class="col-12 col-lg-4">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Node</label>
+                                    <select class="form-select" t-att-value="state.nodeId" t-on-change="onNodeChange">
+                                        <t t-foreach="state.nodes" t-as="node" t-key="node.id">
+                                            <option t-att-value="node.id">
+                                                <t t-esc="node.name"/> - <t t-esc="node.status"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Printer</label>
+                                    <select class="form-select" t-att-disabled="state.multiplePrinters" t-att-value="state.printerId" t-on-change="onPrinterChange">
+                                        <t t-foreach="availablePrinters" t-as="printer" t-key="printer.id">
+                                            <option t-att-value="printer.id">
+                                                <t t-esc="printer.name"/> - <t t-esc="printer.status"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Paper Tray</label>
+                                    <select class="form-select" t-att-value="state.trayId" t-on-change="onTrayChange">
+                                        <t t-foreach="availableTrays" t-as="tray" t-key="tray.id">
+                                            <option t-att-value="tray.id">
+                                                <t t-esc="tray.name"/> - <t t-esc="tray.status"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Copies</label>
+                                    <input class="form-control" min="1" type="number" t-att-value="state.copies" t-on-input="onCopiesChange"/>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" id="resp_multiple_printers" type="checkbox" t-att-checked="state.multiplePrinters" t-on-change="onMultiplePrintersChange"/>
+                                    <label class="form-check-label" for="resp_multiple_printers">Print to multiple printers</label>
+                                </div>
+
+                                <t t-if="state.multiplePrinters">
+                                    <div class="border rounded p-2 mb-3">
+                                        <div class="fw-bold mb-2">Select Printers</div>
+                                        <t t-foreach="availablePrinters" t-as="printer" t-key="printer.id">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" t-att-id="'resp_printer_' + printer.id" t-att-value="printer.id" t-att-checked="isPrinterChecked(printer.id)" t-on-change="togglePrinter"/>
+                                                <label class="form-check-label" t-att-for="'resp_printer_' + printer.id">
+                                                    <t t-esc="printer.name"/> - <t t-esc="printer.status"/>
+                                                </label>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </t>
+
+                                <div t-if="usesDefaultTrays" class="alert alert-info mb-0">
+                                    The printer agent has not published tray details yet. The default tray will be used.
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-8">
+                                <div class="border rounded bg-light" style="height: 70vh; overflow: hidden;">
+                                    <iframe t-att-src="state.previewUrl" style="width: 100%; height: 100%; border: 0; background: white;"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </main>
+        </xpath>
+
+        <xpath expr="//*[hasclass('modal-footer')]" position="replace">
+            <footer t-if="props.footer" class="modal-footer">
+                <button class="btn btn-secondary" t-on-click="cancel" t-att-disabled="state.printing">Cancel</button>
+                <button class="btn btn-primary" t-on-click="printDirect" t-att-disabled="state.loading or state.printing">
+                    <t t-if="state.printing">Creating job...</t>
+                    <t t-else="">Print Directly</t>
+                </button>
+            </footer>
+        </xpath>
+    </t>
+</templates>

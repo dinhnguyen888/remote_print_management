@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Search View for Print Jobs -->
+    <record id="ir_attachment_view_search_print" model="ir.ui.view">
+        <field name="name">ir.attachment.view.search.print</field>
+        <field name="model">ir.attachment</field>
+        <field name="arch" type="xml">
+            <search string="Search Print Jobs">
+                <field name="name"/>
+                <field name="printer_id"/>
+                <field name="create_uid"/>
+                <filter string="Pending Jobs" name="filter_pending" domain="[('print_status', 'in', ['pending', 'draft'])]"/>
+                <filter string="Printing Jobs" name="filter_printing" domain="[('print_status', '=', 'printing')]"/>
+                <filter string="Failed Jobs" name="filter_failed" domain="[('print_status', '=', 'failed')]"/>
+                <filter string="Printed (Done)" name="filter_printed" domain="[('print_status', '=', 'printed')]"/>
+                <separator/>
+                <filter string="Printed Today" name="filter_today" domain="[('create_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="groupby_status" context="{'group_by': 'print_status'}"/>
+                    <filter string="Printer" name="groupby_printer" context="{'group_by': 'printer_id'}"/>
+                    <filter string="Sender" name="groupby_uid" context="{'group_by': 'create_uid'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- List View for Print Jobs -->
+    <record id="ir_attachment_view_tree_print" model="ir.ui.view">
+        <field name="name">ir.attachment.view.list.print</field>
+        <field name="model">ir.attachment</field>
+        <field name="arch" type="xml">
+            <list create="0">
+                <field name="create_date"/>
+                <field name="name"/>
+                <field name="printer_id"/>
+                <field name="copies"/>
+                <field name="print_status" widget="badge"
+                       decoration-success="print_status == 'printed'"
+                       decoration-danger="print_status == 'failed'"
+                       decoration-warning="print_status == 'printing'"
+                       decoration-muted="print_status in ('draft', 'pending')"/>
+                <field name="create_uid"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View for Print Jobs -->
+    <record id="ir_attachment_view_form_print" model="ir.ui.view">
+        <field name="name">ir.attachment.view.form.print</field>
+        <field name="model">ir.attachment</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <sheet>
+                    <group>
+                        <group string="Job Details">
+                            <field name="name"/>
+                            <field name="printer_id"/>
+                            <field name="copies"/>
+                            <field name="print_status"/>
+                        </group>
+                        <group string="Sender Info">
+                            <field name="create_uid"/>
+                            <field name="create_date"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Error Details" invisible="not printer_error_message">
+                        <field name="printer_error_message" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Print Jobs Window Action -->
+    <record id="ir_attachment_print_action" model="ir.actions.act_window">
+        <field name="name">Print Jobs</field>
+        <field name="res_model">ir.attachment</field>
+        <field name="path">print_jobs</field>
+        <field name="search_view_id" ref="ir_attachment_view_search_print"/>
+        <field name="domain">[('printer_id', '!=', False)]</field>
+        <field name="context">{'create': False}</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('ir_attachment_view_tree_print')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('ir_attachment_view_form_print')})]"/>
+    </record>
+</odoo>

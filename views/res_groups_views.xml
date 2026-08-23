@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_groups_view_form_inherit_direct_print" model="ir.ui.view">
+        <field name="name">res.groups.view.form.inherit.direct.print</field>
+        <field name="model">res.groups</field>
+        <field name="inherit_id" ref="base.view_groups_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Direct Print Access Control" name="direct_print_access">
+                    <group string="Submenu Visibility">
+                        <field name="printer_menu_dashboard"/>
+                        <field name="printer_menu_printers"/>
+                        <field name="printer_menu_jobs"/>
+                        <field name="printer_menu_tokens"/>
+                        <field name="printer_menu_config"/>
+                    </group>
+                    <group string="Dashboard Sections Visibility">
+                        <field name="printer_show_kpis"/>
+                        <field name="printer_show_chart"/>
+                        <field name="printer_show_lanes"/>
+                        <field name="printer_show_agents"/>
+                        <field name="printer_show_recent_jobs"/>
+                    </group>
+                    <group string="Dashboard Actions Allowed">
+                        <field name="printer_allow_quick_print"/>
+                        <field name="printer_allow_export_report"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_printer_res_groups" model="ir.actions.act_window">
+        <field name="name">User Group Access Control</field>
+        <field name="res_model">res.groups</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Manage Submenu &amp; Dashboard Access Control for User Groups
+            </p>
+        </field>
+    </record>
+</odoo>

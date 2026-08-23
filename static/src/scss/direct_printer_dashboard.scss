@@ -1,0 +1,294 @@
+.o_direct_printer_dashboard {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    .dashboard_container {
+        max-width: 90%;
+        margin: 0 auto;
+        padding: 30px;
+    }
+
+    // ── Stat Cards ───────────────────────────────────────────────────────────
+    .stat_card {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+    }
+
+    // ── Agent Cards ──────────────────────────────────────────────────────────
+    .agent-card {
+        transition: all 0.2s ease;
+        border-color: #f1f5f9 !important;
+
+        &:hover {
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            background-color: #f8f9fc !important;
+        }
+    }
+
+    // ── Lane Job Cards ───────────────────────────────────────────────────────
+    .lane-job-card {
+        background: #fff;
+        transition: all 0.2s ease;
+        border-color: #f1f5f9 !important;
+        border-left: 4px solid transparent !important;
+
+        &:hover {
+            background: #f8f9fc;
+            border-color: #e2e8f0 !important;
+            border-left-color: #5b5fc7 !important;
+        }
+    }
+
+    // ── Status Indicator dot ─────────────────────────────────────────────────
+    .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px #fff;
+    }
+
+    // ── Custom Scrollbar ─────────────────────────────────────────────────────
+    .custom-scroll {
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    // ── Recent Jobs Table ────────────────────────────────────────────────────
+    .custom-table {
+        th {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 11px;
+            background-color: #f8f9fc !important;
+            padding-top: 16px !important;
+            padding-bottom: 16px !important;
+        }
+
+        td {
+            padding-top: 14px !important;
+            padding-bottom: 14px !important;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: #f8f9fc;
+            }
+        }
+    }
+
+    // ── Flash animation ──────────────────────────────────────────────────────
+    @keyframes flash-warning {
+        0%   { opacity: 1; transform: scale(1); }
+        50%  { opacity: 0.6; transform: scale(1.1); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+
+    .flash-icon {
+        animation: flash-warning 1.5s infinite ease-in-out;
+    }
+
+    // =========================================================================
+    // RESPONSIVE — Tablet (≤ 991px)
+    // =========================================================================
+    @media (max-width: 991.98px) {
+        .dashboard_container {
+            max-width: 100%;
+            padding: 16px;
+        }
+
+        // Header stacks vertically on tablet
+        .dashboard_header {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 12px;
+
+            .header_right {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+
+                .btn {
+                    flex: 1 1 auto;
+                    min-width: 120px;
+                    font-size: 13px;
+                    padding: 8px 12px;
+                }
+            }
+        }
+
+        // KPI cards: 2 per row
+        .row.g-4.mb-4:first-of-type > div {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .stat_card {
+            // Disable hover lift on touch devices
+            &:hover {
+                transform: none;
+            }
+        }
+
+        // Lanes: stack vertically
+        .lane-job-card {
+            font-size: 13px;
+        }
+
+        // Agents panel: reduce fixed height
+        .col-12.col-lg-4 .flex-grow-1.overflow-auto {
+            height: auto !important;
+            max-height: 300px;
+        }
+
+        // Log lanes area fixed height → auto
+        .col-12.col-md-4 .flex-grow-1.overflow-auto {
+            height: 220px !important;
+        }
+    }
+
+    // =========================================================================
+    // RESPONSIVE — Mobile (≤ 575px)
+    // =========================================================================
+    @media (max-width: 575.98px) {
+        .dashboard_container {
+            padding: 12px 10px;
+        }
+
+        // Header
+        .dashboard_header {
+            .header_left h1 {
+                font-size: 20px !important;
+            }
+
+            .header_right {
+                gap: 8px !important;
+
+                .btn {
+                    font-size: 12px;
+                    padding: 7px 10px;
+                }
+            }
+        }
+
+        // KPI cards: 1 per row (full-width stacked)
+        .row.g-4 > [class*="col-"] {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+
+        .stat_card {
+            h2.fs-2 {
+                font-size: 1.6rem !important;
+            }
+        }
+
+        // Agents panel - disable fixed scroll height, let it grow naturally
+        .col-12.col-lg-4 .flex-grow-1.overflow-auto {
+            height: auto !important;
+            max-height: 260px;
+        }
+
+        // Lane columns - full width, shorter scroll area
+        .col-12.col-md-4 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+
+            .flex-grow-1.overflow-auto {
+                height: 180px !important;
+            }
+        }
+
+        // Recent Jobs table: hide less critical columns
+        .custom-table {
+            th, td {
+                font-size: 11px !important;
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+                padding-top: 10px !important;
+                padding-bottom: 10px !important;
+            }
+
+            // Hide Node and Sender columns on mobile
+            th:nth-child(4),
+            td:nth-child(4),
+            th:nth-child(5),
+            td:nth-child(5) {
+                display: none;
+            }
+        }
+
+        // Status badge - smaller
+        .badge {
+            font-size: 10px;
+            padding: 3px 7px !important;
+        }
+
+        // Chart card - reduce min-height
+        [t-ref="rpdChart"],
+        div[style*="min-height: 280px"] {
+            min-height: 200px !important;
+        }
+
+        // Agent card layout
+        .agent-card {
+            flex-direction: row;
+            gap: 8px;
+            padding: 10px !important;
+
+            .fw-bold[style*="font-size: 14px"] {
+                font-size: 13px !important;
+            }
+        }
+
+        // Show More buttons — full width
+        .btn-light.border.rounded-pill.w-100 {
+            font-size: 12px;
+        }
+    }
+
+    // =========================================================================
+    // RESPONSIVE — Very Small (≤ 360px)  e.g. older Android phones
+    // =========================================================================
+    @media (max-width: 360px) {
+        .dashboard_container {
+            padding: 8px 6px;
+        }
+
+        .dashboard_header .header_left h1 {
+            font-size: 17px !important;
+        }
+
+        .stat_card h2.fs-2 {
+            font-size: 1.3rem !important;
+        }
+
+        .custom-table th,
+        .custom-table td {
+            font-size: 10px !important;
+        }
+    }
+}

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Wizard Form View for generating Printer Agent API Key -->
+    <record id="printer_agent_apikey_wizard_view_form" model="ir.ui.view">
+        <field name="name">printer.agent.apikey.wizard.form</field>
+        <field name="model">printer.agent.apikey.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Printer Agent API Key">
+                <group>
+                    <field name="name" placeholder="e.g. Main Print Agent, Packing Station 1"/>
+                    <field name="duration"/>
+                    <field name="expiration_date" invisible="duration != '-1'"/>
+                </group>
+                <footer>
+                    <button name="action_generate_key" string="Generate Key" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open Wizard dialog -->
+    <record id="action_new_printer_agent_apikey" model="ir.actions.act_window">
+        <field name="name">Generate Printer Agent API Key</field>
+        <field name="res_model">printer.agent.apikey.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- List View for API Keys with Header 'New API Key' Button -->
+    <record id="printer_agent_apikey_view_tree" model="ir.ui.view">
+        <field name="name">res.users.apikeys.printer_agent.list</field>
+        <field name="model">res.users.apikeys</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false">
+                <header>
+                    <button name="%(action_new_printer_agent_apikey)d"
+                            string="New API Key"
+                            type="action"
+                            class="btn-primary"
+                            display="always"
+                            icon="fa-key"/>
+                </header>
+                <field name="user_id" string="Agent User"/>
+                <field name="name" string="Key Label"/>
+                <field name="create_date" string="Created"/>
+                <field name="expiration_date" string="Expires"/>
+                <button type="object" name="remove" title="Revoke this key" icon="fa-trash" class="btn-danger"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Menu Action to view Agent API Keys -->
+    <record id="printer_agent_token_action" model="ir.actions.act_window">
+        <field name="name">Agent API Keys</field>
+        <field name="res_model">res.users.apikeys</field>
+        <field name="path">printer_agent_keys</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="printer_agent_apikey_view_tree"/>
+        <field name="domain">['|', ('name', 'ilike', 'Printer Agent'), ('user_id.login', '=', 'printer_agent')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Printer Agent API Key found.
+            </p>
+            <p>
+                Click <b>New API Key</b> above to generate an API key for the print agent.<br/>
+                Copy the generated secret key into the agent's <code>.env</code> file as <code>ODOO_API_KEY=&lt;key&gt;</code>.
+            </p>
+        </field>
+    </record>
+
+</odoo>

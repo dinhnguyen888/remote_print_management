@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root Menu -->
+    <menuitem id="direct_printer_root_menu" name="Printer Dashboard" action="action_direct_printer_dashboard" sequence="80"/>
+
+    <!-- Submenus -->
+    <menuitem id="printer_node_menu" name="Nodes" parent="direct_printer_root_menu" action="printer_node_action" sequence="5"/>
+    <menuitem id="printer_details_menu" name="Printers" parent="direct_printer_root_menu" action="printer_details_action" sequence="10"/>
+    <menuitem id="direct_printer_job_menu" name="Jobs" parent="direct_printer_root_menu" action="ir_attachment_print_action" sequence="20"/>
+    <menuitem id="printer_agent_token_menu" name="Agent Management" parent="direct_printer_root_menu" action="printer_agent_token_action" sequence="30"/>
+    <menuitem id="menu_direct_print_config" name="Configuration" parent="direct_printer_root_menu" sequence="100" action="action_direct_print_config_settings"/>
+</odoo>

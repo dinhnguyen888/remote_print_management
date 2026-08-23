@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Config Settings Window Action -->
+    <record id="action_direct_print_config_settings" model="ir.actions.act_window">
+        <field name="name">Configuration</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="path">direct_print_config</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'remote_print_management', 'bin_size': False}</field>
+    </record>
+
+    <!-- Config Settings Form Inherit -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.remote.print</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="20"/>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Remote Print" string="Remote Print" name="remote_print_management">
+                    <block title="Printer Routing &amp; Behavior">
+                        <setting string="Default Printer" help="Default printer route used for automated report printing.">
+                            <field name="available_printers_id" options="{'no_create': True, 'no_open': False}"/>
+                        </setting>
+                        <setting string="Multiple Printers" help="Send report to multiple selected printers simultaneously.">
+                            <field name="multiple_printers"/>
+                            <div class="mt-2" invisible="not multiple_printers">
+                                <field name="printers_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': False}"/>
+                            </div>
+                        </setting>
+                        <setting string="Enable Silent Printer Toggle" help="Automatically use default printer without prompting printer selection modal.">
+                            <field name="enable_silent_print"/>
+                        </setting>
+                        <setting string="Scan Local Printers" help="Request online agent nodes to scan and synchronize their connected printers.">
+                            <button name="action_scan_printers" type="object" string="Scan Local Printers" class="btn-primary" icon="fa-refresh"/>
+                        </setting>
+                        <setting string="Download Printer Agent" help="Download Printer Agent installer for Windows (.exe), Linux (.deb / .rpm), and Android (.apk).">
+                            <button name="action_download_agent" type="object" string="Download Agent" class="btn-primary" icon="fa-download"/>
+                        </setting>
+                    </block>
+
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>
