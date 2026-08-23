@@ -1,879 +1,340 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remote & Direct Print Management for Odoo | By Nguyen Phuc Dinh</title>
-    <!-- Google Fonts: Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Font Awesome 6.5.1 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Bootstrap 5 CSS for base grid compatibility -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
-
-    <style>
-        :root {
-            --rpm-primary: #4F46E5;
-            --rpm-primary-hover: #4338CA;
-            --rpm-primary-light: #EEF2FF;
-            --rpm-secondary: #0F172A;
-            --rpm-accent: #06B6D4;
-            --rpm-success: #10B981;
-            --rpm-warning: #F59E0B;
-            --rpm-danger: #EF4444;
-            --rpm-dark: #0F172A;
-            --rpm-gray-50: #F8FAFC;
-            --rpm-gray-100: #F1F5F9;
-            --rpm-gray-200: #E2E8F0;
-            --rpm-gray-400: #94A3B8;
-            --rpm-gray-600: #475569;
-            --rpm-gray-800: #1E293B;
-            --rpm-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --rpm-radius-sm: 8px;
-            --rpm-radius-md: 14px;
-            --rpm-radius-lg: 20px;
-            --rpm-radius-xl: 28px;
-            --rpm-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
-            --rpm-shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.07), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-            --rpm-shadow-lg: 0 20px 35px -10px rgba(79, 70, 229, 0.15);
-            --rpm-shadow-card: 0 1px 3px rgba(0,0,0,0.05), 0 10px 24px -5px rgba(15, 23, 42, 0.05);
-        }
-
-        .rpm-wrapper {
-            font-family: var(--rpm-font);
-            color: var(--rpm-gray-800);
-            background-color: #FAFCFF;
-            line-height: 1.65;
-            padding: 30px 15px;
-            letter-spacing: -0.01em;
-        }
-
-        .rpm-container {
-            max-width: 1180px;
-            margin: 0 auto;
-        }
-
-        /* Hero Section */
-        .rpm-hero {
-            position: relative;
-            background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 45%, #312E81 80%, #4338CA 100%);
-            border-radius: var(--rpm-radius-xl);
-            padding: 65px 35px;
-            color: #FFFFFF;
-            overflow: hidden;
-            box-shadow: var(--rpm-shadow-lg);
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .rpm-hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -30%;
-            width: 160%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 60%);
-            pointer-events: none;
-        }
-
-        .rpm-hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 6px 18px;
-            border-radius: 9999px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #E0E7FF;
-            margin-bottom: 24px;
-        }
-
-        .rpm-hero-badge .rpm-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--rpm-success);
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 10px var(--rpm-success);
-        }
-
-        .rpm-hero-title {
-            font-size: clamp(2rem, 4.5vw, 3.2rem);
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            line-height: 1.18;
-            margin-bottom: 20px;
-            color: #FFFFFF;
-        }
-
-        .rpm-hero-title span {
-            background: linear-gradient(135deg, #38BDF8 0%, #818CF8 50%, #C084FC 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .rpm-hero-desc {
-            font-size: clamp(1.05rem, 1.8vw, 1.25rem);
-            font-weight: 400;
-            color: #CBD5E1;
-            max-width: 820px;
-            margin: 0 auto 28px auto;
-            line-height: 1.6;
-        }
-
-        .rpm-hero-author {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            padding: 6px 16px;
-            border-radius: 9999px;
-            color: #E2E8F0;
-            font-size: 0.88rem;
-            margin-bottom: 28px;
-        }
-
-        .rpm-hero-author a {
-            color: #38BDF8;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .rpm-hero-author a:hover {
-            text-decoration: underline;
-        }
-
-        .rpm-hero-tags {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .rpm-hero-tag {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 9px 18px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #FFFFFF;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.25s ease;
-        }
-
-        .rpm-hero-tag:hover {
-            background: rgba(255, 255, 255, 0.18);
-            transform: translateY(-2px);
-        }
-
-        /* Section Headings */
-        .rpm-section-header {
-            text-align: center;
-            margin-bottom: 45px;
-        }
-
-        .rpm-pretitle {
-            display: inline-block;
-            text-transform: uppercase;
-            font-size: 0.82rem;
-            font-weight: 800;
-            letter-spacing: 1.8px;
-            color: var(--rpm-primary);
-            background: var(--rpm-primary-light);
-            padding: 6px 14px;
-            border-radius: 9999px;
-            margin-bottom: 12px;
-        }
-
-        .rpm-title {
-            font-size: clamp(1.75rem, 3.2vw, 2.35rem);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: var(--rpm-dark);
-            margin-bottom: 14px;
-        }
-
-        .rpm-subtitle {
-            font-size: 1.05rem;
-            color: var(--rpm-gray-600);
-            max-width: 680px;
-            margin: 0 auto;
-        }
-
-        /* Grid Layouts */
-        .rpm-grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px;
-        }
-
-        .rpm-grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 24px;
-        }
-
-        .rpm-grid-4 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-        }
-
-        /* Cards */
-        .rpm-card {
-            background: #FFFFFF;
-            border-radius: var(--rpm-radius-lg);
-            border: 1px solid var(--rpm-gray-200);
-            box-shadow: var(--rpm-shadow-card);
-            padding: 32px 26px;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .rpm-card:hover {
-            transform: translateY(-5px);
-            border-color: #C7D2FE;
-            box-shadow: 0 16px 32px -8px rgba(79, 70, 229, 0.12);
-        }
-
-        .rpm-icon-box {
-            width: 58px;
-            height: 58px;
-            border-radius: var(--rpm-radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 22px;
-            flex-shrink: 0;
-        }
-
-        .rpm-icon-indigo { background: #EEF2FF; color: #4F46E5; }
-        .rpm-icon-emerald { background: #ECFDF5; color: #059669; }
-        .rpm-icon-amber { background: #FEF3C7; color: #D97706; }
-        .rpm-icon-blue { background: #EFF6FF; color: #2563EB; }
-        .rpm-icon-rose { background: #FFE4E6; color: #E11D48; }
-        .rpm-icon-purple { background: #F3E8FF; color: #9333EA; }
-
-        .rpm-card-title {
-            font-size: 1.22rem;
-            font-weight: 700;
-            color: var(--rpm-dark);
-            margin-bottom: 10px;
-            letter-spacing: -0.01em;
-        }
-
-        .rpm-card-text {
-            color: var(--rpm-gray-600);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 0;
-        }
-
-        /* Feature Large Section */
-        .rpm-feature-card {
-            background: #FFFFFF;
-            border: 1px solid var(--rpm-gray-200);
-            border-radius: var(--rpm-radius-lg);
-            padding: 26px;
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-            box-shadow: var(--rpm-shadow-sm);
-            transition: all 0.25s ease;
-        }
-
-        .rpm-feature-card:hover {
-            border-color: #A5B4FC;
-            background: #FDFEFE;
-            box-shadow: var(--rpm-shadow-md);
-            transform: translateY(-3px);
-        }
-
-        /* Step Process */
-        .rpm-step-card {
-            background: #FFFFFF;
-            border-radius: var(--rpm-radius-lg);
-            border: 1px solid var(--rpm-gray-200);
-            padding: 30px 22px;
-            text-align: center;
-            position: relative;
-            box-shadow: var(--rpm-shadow-card);
-            transition: all 0.3s ease;
-        }
-
-        .rpm-step-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--rpm-primary);
-        }
-
-        .rpm-step-badge {
-            width: 46px;
-            height: 46px;
-            background: linear-gradient(135deg, var(--rpm-primary) 0%, #312E81 100%);
-            color: #FFFFFF;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            font-weight: 800;
-            margin-bottom: 18px;
-            box-shadow: 0 6px 14px rgba(79, 70, 229, 0.35);
-        }
-
-        /* Developer Card */
-        .rpm-author-card {
-            background: #FFFFFF;
-            border-radius: var(--rpm-radius-xl);
-            border: 1px solid var(--rpm-gray-200);
-            padding: 36px 30px;
-            box-shadow: var(--rpm-shadow-card);
-            margin: 60px 0 30px 0;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 24px;
-        }
-
-        .rpm-author-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .rpm-author-avatar {
-            width: 72px;
-            height: 72px;
-            background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
-            color: #FFFFFF;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            font-weight: 800;
-            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.25);
-            flex-shrink: 0;
-        }
-
-        .rpm-author-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .rpm-author-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.92rem;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .rpm-author-btn-gh {
-            background: #0F172A;
-            color: #FFFFFF !important;
-        }
-        .rpm-author-btn-gh:hover {
-            background: #1E293B;
-            transform: translateY(-2px);
-        }
-
-        .rpm-author-btn-mail {
-            background: #EEF2FF;
-            color: #4F46E5 !important;
-            border: 1px solid #C7D2FE;
-        }
-        .rpm-author-btn-mail:hover {
-            background: #E0E7FF;
-            transform: translateY(-2px);
-        }
-
-        /* CTA Banner */
-        .rpm-cta {
-            background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 60%, #312E81 100%);
-            border-radius: var(--rpm-radius-xl);
-            padding: 55px 30px;
-            color: #FFFFFF;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--rpm-shadow-lg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 50px;
-        }
-
-        .rpm-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: #4F46E5;
-            color: #FFFFFF !important;
-            font-weight: 700;
-            font-size: 1.05rem;
-            padding: 14px 34px;
-            border-radius: 12px;
-            text-decoration: none;
-            transition: all 0.25s ease;
-            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
-            border: none;
-        }
-
-        .rpm-btn:hover {
-            background: #4338CA;
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(79, 70, 229, 0.55);
-            color: #FFFFFF;
-        }
-
-        .rpm-video-thumb {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: var(--rpm-radius-md);
-            background: #0F172A;
-            display: block;
-            text-decoration: none;
-            cursor: pointer;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-        }
-
-        .rpm-video-thumb img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.35s ease;
-        }
-
-        .rpm-video-thumb:hover img {
-            transform: scale(1.05);
-        }
-
-        .rpm-video-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.6) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s ease;
-        }
-
-        .rpm-video-thumb:hover .rpm-video-overlay {
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.1) 0%, rgba(15, 23, 42, 0.4) 100%);
-        }
-
-        .rpm-play-btn {
-            width: 66px;
-            height: 66px;
-            background: #FF0000;
-            color: #FFFFFF;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 10px 25px rgba(255, 0, 0, 0.45);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 3px solid rgba(255, 255, 255, 0.9);
-        }
-
-        .rpm-video-thumb:hover .rpm-play-btn {
-            transform: scale(1.14);
-            box-shadow: 0 14px 35px rgba(255, 0, 0, 0.65);
-        }
-
-        .rpm-video-badge {
-            position: absolute;
-            bottom: 12px;
-            right: 12px;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(8px);
-            color: #FFFFFF;
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        @media (max-width: 768px) {
-            .rpm-hero { padding: 40px 20px; }
-            .rpm-grid-2, .rpm-grid-3, .rpm-grid-4 { grid-template-columns: 1fr; }
-            .rpm-feature-card { flex-direction: column; }
-            .rpm-author-card { flex-direction: column; text-align: center; }
-            .rpm-author-info { flex-direction: column; text-align: center; }
-            .rpm-author-links { justify-content: center; }
-        }
-    </style>
-</head>
-<body style="margin: 0; padding: 0;">
-
-<div class="rpm-wrapper">
-    <div class="rpm-container">
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; background-color: #f8fafc; line-height: 1.65; padding: 30px 15px; letter-spacing: -0.01em;">
+    <div style="max-width: 1140px; margin: 0 auto;">
 
         <!-- ==================== HERO BANNER ==================== -->
-        <section class="rpm-hero">
-            <div class="rpm-hero-badge">
-                <span class="rpm-dot"></span>
-                <span>100% LOCAL EXECUTION &bull; NO 3RD-PARTY CLOUD</span>
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 45%, #312e81 80%, #4338ca 100%); border-radius: 24px; padding: 55px 30px; color: #ffffff; text-align: center; box-shadow: 0 20px 35px -10px rgba(79, 70, 229, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); margin-bottom: 50px;">
+            <div style="display: inline-block; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); padding: 6px 18px; border-radius: 9999px; font-size: 12px; font-weight: 700; color: #e0e7ff; margin-bottom: 22px; letter-spacing: 0.8px;">
+                <span style="display: inline-block; width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; margin-right: 6px;"></span>
+                100% LOCAL EXECUTION &bull; NO 3RD-PARTY CLOUD
             </div>
 
-            <h1 class="rpm-hero-title">
+            <h1 style="font-size: 36px; font-weight: 800; line-height: 1.25; margin-top: 0; margin-bottom: 18px; color: #ffffff; letter-spacing: -0.02em;">
                 Remote &amp; Direct Print Management<br>
-                <span>Fast, Silent &amp; Zero-Cloud Dependency</span>
+                <span style="color: #38bdf8;">Fast, Silent &amp; Zero-Cloud Dependency</span>
             </h1>
 
-            <p class="rpm-hero-desc">
+            <p style="font-size: 17px; font-weight: 400; color: #cbd5e1; max-width: 820px; margin: 0 auto 26px auto; line-height: 1.65;">
                 Streamline your physical printing workflow. Print invoices, delivery slips, picking lists, barcodes, and POS receipts straight to client and warehouse printers without downloading PDFs or opening browser dialogs!
             </p>
 
-            <div class="rpm-hero-author">
-                <i class="fa-solid fa-code" style="color: #38BDF8;"></i>
-                <span>Developed by <strong>Nguyen Phuc Dinh</strong></span>
-                <span style="opacity: 0.4;">|</span>
-                <a href="https://github.com/dinhnguyen888" target="_blank">
-                    <i class="fa-brands fa-github mr-1"></i> dinhnguyen888
+            <div style="display: inline-block; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); padding: 7px 20px; border-radius: 9999px; color: #e2e8f0; font-size: 14px; margin-bottom: 28px;">
+                <span>Developed by <strong style="color: #ffffff;">Nguyen Phuc Dinh</strong></span>
+                <span style="opacity: 0.4; margin: 0 10px;">|</span>
+                <a href="https://github.com/dinhnguyen888" target="_blank" style="color: #38bdf8; text-decoration: none; font-weight: 600;">
+                    github.com/dinhnguyen888
                 </a>
             </div>
 
-            <div class="rpm-hero-tags">
-                <div class="rpm-hero-tag">
-                    <i class="fa-solid fa-bolt" style="color: #FBBF24;"></i>
-                    <span>Instant Direct Print</span>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 10px;">
+                <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; color: #ffffff;">
+                    &#9889; Instant Direct Print
                 </div>
-                <div class="rpm-hero-tag">
-                    <i class="fa-solid fa-network-wired" style="color: #38BDF8;"></i>
-                    <span>Multi-Node Agents</span>
+                <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; color: #ffffff;">
+                    &#128268; Multi-Node Agents
                 </div>
-                <div class="rpm-hero-tag">
-                    <i class="fa-solid fa-chart-line" style="color: #34D399;"></i>
-                    <span>Real-time Dashboard</span>
+                <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; color: #ffffff;">
+                    &#128202; Real-time Dashboard
                 </div>
-                <div class="rpm-hero-tag">
-                    <i class="fa-solid fa-user-lock" style="color: #F472B6;"></i>
-                    <span>Role-Based Security</span>
+                <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; color: #ffffff;">
+                    &#128274; Role-Based Security
                 </div>
-                <div class="rpm-hero-tag">
-                    <i class="fa-solid fa-eye" style="color: #A78BFA;"></i>
-                    <span>Optional Preview Dialog</span>
+                <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; color: #ffffff;">
+                    &#128065; Optional Preview Modal
                 </div>
             </div>
-        </section>
+        </div>
 
 
         <!-- ==================== SECTION 1: WHY CHOOSE THIS MODULE ==================== -->
-        <section style="margin: 70px 0 50px 0;">
-            <div class="rpm-section-header">
-                <span class="rpm-pretitle"><i class="fa-solid fa-gem mr-1"></i> Core Advantage</span>
-                <h2 class="rpm-title">Why Choose Remote Print Management?</h2>
-                <p class="rpm-subtitle">
+        <div style="margin: 60px 0 40px 0;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <div style="display: inline-block; text-transform: uppercase; font-size: 12px; font-weight: 800; letter-spacing: 1.8px; color: #4f46e5; background: #eef2ff; padding: 6px 16px; border-radius: 9999px; margin-bottom: 12px;">
+                    Core Advantage
+                </div>
+                <h2 style="font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 10px 0; letter-spacing: -0.02em;">
+                    Why Choose Remote Print Management?
+                </h2>
+                <p style="font-size: 16px; color: #64748b; max-width: 680px; margin: 0 auto;">
                     Designed from the ground up for complete independence, privacy, high reliability, and zero hidden costs.
                 </p>
             </div>
 
-            <div class="rpm-grid-3">
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
                 <!-- Benefit 1 -->
-                <div class="rpm-card">
-                    <div class="rpm-icon-box rpm-icon-indigo">
-                        <i class="fa-solid fa-shield-halved"></i>
+                <div style="flex: 1 1 calc(33.333% - 20px); min-width: 290px; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; padding: 28px 24px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04); box-sizing: border-box;">
+                    <div style="width: 50px; height: 50px; border-radius: 12px; background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 18px; font-weight: bold;">
+                        &#128737;
                     </div>
-                    <h3 class="rpm-card-title">100% Local &amp; Privacy-Safe</h3>
-                    <p class="rpm-card-text">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 10px 0;">100% Local &amp; Privacy-Safe</h3>
+                    <p style="color: #64748b; font-size: 14.5px; line-height: 1.6; margin: 0;">
                         Zero third-party cloud servers, external APIs, or data transmission outside your perimeter. All print streams, documents, and sensitive customer invoices stay strictly inside your own private network.
                     </p>
                 </div>
 
                 <!-- Benefit 2 -->
-                <div class="rpm-card">
-                    <div class="rpm-icon-box rpm-icon-emerald">
-                        <i class="fa-solid fa-wallet"></i>
+                <div style="flex: 1 1 calc(33.333% - 20px); min-width: 290px; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; padding: 28px 24px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04); box-sizing: border-box;">
+                    <div style="width: 50px; height: 50px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 18px; font-weight: bold;">
+                        &#128176;
                     </div>
-                    <h3 class="rpm-card-title">One-Time Buy, Lifetime Use</h3>
-                    <p class="rpm-card-text">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 10px 0;">One-Time Buy, Lifetime Use</h3>
+                    <p style="color: #64748b; font-size: 14.5px; line-height: 1.6; margin: 0;">
                         Say goodbye to recurring SaaS fees! No monthly subscriptions, no per-printer licenses, and zero per-page charges. Purchase once and scale infinitely across all company branches.
                     </p>
                 </div>
 
                 <!-- Benefit 3 -->
-                <div class="rpm-card">
-                    <div class="rpm-icon-box rpm-icon-amber">
-                        <i class="fa-solid fa-globe"></i>
+                <div style="flex: 1 1 calc(33.333% - 20px); min-width: 290px; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; padding: 28px 24px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04); box-sizing: border-box;">
+                    <div style="width: 50px; height: 50px; border-radius: 12px; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 18px; font-weight: bold;">
+                        &#127760;
                     </div>
-                    <h3 class="rpm-card-title">Works Across Any Network</h3>
-                    <p class="rpm-card-text">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 10px 0;">Works Across Any Network</h3>
+                    <p style="color: #64748b; font-size: 14.5px; line-height: 1.6; margin: 0;">
                         Whether Odoo is deployed on Odoo.sh, AWS, or local on-premise servers, agent nodes establish secure outbound WebSocket tunnels. Works seamlessly through strict firewalls, NAT, dynamic IPs, and VPNs.
                     </p>
                 </div>
 
                 <!-- Benefit 4 -->
-                <div class="rpm-card">
-                    <div class="rpm-icon-box rpm-icon-blue">
-                        <i class="fa-solid fa-code-commit"></i>
+                <div style="flex: 1 1 calc(33.333% - 20px); min-width: 290px; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; padding: 28px 24px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04); box-sizing: border-box;">
+                    <div style="width: 50px; height: 50px; border-radius: 12px; background: #eff6ff; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 18px; font-weight: bold;">
+                        &#128640;
                     </div>
-                    <h3 class="rpm-card-title">Rapid Bug Fixes &amp; Active Support</h3>
-                    <p class="rpm-card-text">
-                        Get continuous enhancements and direct support from developer <strong>Nguyen Phuc Dinh</strong>. New printer driver compatibility and issue resolutions are rolled out swiftly based on real-world feedback.
+                    <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 10px 0;">Rapid Updates &amp; Active Support</h3>
+                    <p style="color: #64748b; font-size: 14.5px; line-height: 1.6; margin: 0;">
+                        Get continuous enhancements and direct support from developer <strong style="color: #0f172a;">Nguyen Phuc Dinh</strong>. New printer driver compatibility and issue resolutions are rolled out swiftly based on real-world feedback.
                     </p>
                 </div>
 
                 <!-- Benefit 5 -->
-                <div class="rpm-card">
-                    <div class="rpm-icon-box rpm-icon-rose">
-                        <i class="fa-solid fa-gauge-high"></i>
+                <div style="flex: 1 1 calc(33.333% - 20px); min-width: 290px; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; padding: 28px 24px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04); box-sizing: border-box;">
+                    <div style="width: 50px; height: 50px; border-radius: 12px; background: #ffe4e6; color: #e11d48; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 18px; font-weight: bold;">
+                        &#9889;
                     </div>
-                    <h3 class="rpm-card-title">Zero Delay &amp; No PDF Downloads</h3>
-                    <p class="rpm-card-text">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 10px 0;">Zero Delay &amp; No PDF Downloads</h3>
+                    <p style="color: #64748b; font-size: 14.5px; line-height: 1.6; margin: 0;">
                         Eliminate the slow ritual of downloading PDF files, waiting for viewer popups, and clicking browser print buttons. Warehouse pickers and cashiers print with zero friction.
                     </p>
                 </div>
 
                 <!-- Benefit 6 -->
-                <div class="rpm-card">
-                    <div class="rpm-icon-box rpm-icon-purple">
-                        <i class="fa-solid fa-microchip"></i>
+                <div style="flex: 1 1 calc(33.333% - 20px); min-width: 290px; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; padding: 28px 24px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04); box-sizing: border-box;">
+                    <div style="width: 50px; height: 50px; border-radius: 12px; background: #f3e8ff; color: #9333ea; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 18px; font-weight: bold;">
+                        &#128187;
                     </div>
-                    <h3 class="rpm-card-title">No Expensive IoT Hardware</h3>
-                    <p class="rpm-card-text">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 10px 0;">No Expensive IoT Hardware</h3>
+                    <p style="color: #64748b; font-size: 14.5px; line-height: 1.6; margin: 0;">
                         No need to invest in proprietary IoT boxes or hardware dongles. Convert any ordinary PC, POS terminal, or Raspberry Pi into a dedicated print server node with our lightweight agent daemon.
                     </p>
                 </div>
             </div>
-        </section>
+        </div>
 
 
         <!-- ==================== SECTION 2: WHAT FEATURES ==================== -->
-        <section style="margin: 70px 0 50px 0;">
-            <div class="rpm-section-header">
-                <span class="rpm-pretitle"><i class="fa-solid fa-layer-group mr-1"></i> Comprehensive Suite</span>
-                <h2 class="rpm-title">Key Feature Highlights</h2>
-                <p class="rpm-subtitle">
+        <div style="margin: 60px 0 40px 0;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <div style="display: inline-block; text-transform: uppercase; font-size: 12px; font-weight: 800; letter-spacing: 1.8px; color: #4f46e5; background: #eef2ff; padding: 6px 16px; border-radius: 9999px; margin-bottom: 12px;">
+                    Comprehensive Suite
+                </div>
+                <h2 style="font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 10px 0; letter-spacing: -0.02em;">
+                    Key Feature Highlights
+                </h2>
+                <p style="font-size: 16px; color: #64748b; max-width: 680px; margin: 0 auto;">
                     A centralized, intelligent print management cockpit integrated directly within your Odoo backend.
                 </p>
             </div>
 
-            <div class="rpm-grid-2">
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
                 <!-- Feature 1 -->
-                <div class="rpm-feature-card">
-                    <div class="rpm-icon-box rpm-icon-indigo" style="margin-bottom: 0;">
-                        <i class="fa-solid fa-print"></i>
+                <div style="flex: 1 1 calc(50% - 20px); min-width: 320px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 24px; display: flex; gap: 18px; align-items: flex-start; box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03); box-sizing: border-box;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
+                        &#128424;
                     </div>
                     <div>
-                        <h4 class="rpm-card-title mb-2">1. Direct &amp; Silent Printing</h4>
-                        <p class="rpm-card-text">
+                        <h4 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">1. Direct &amp; Silent Printing</h4>
+                        <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0;">
                             Send print jobs automatically on record validation (e.g., validate Invoice &rarr; auto-print invoice, validate Picking &rarr; auto-print packing label) directly to designated physical printers.
                         </p>
                     </div>
                 </div>
 
                 <!-- Feature 2 -->
-                <div class="rpm-feature-card">
-                    <div class="rpm-icon-box rpm-icon-emerald" style="margin-bottom: 0;">
-                        <i class="fa-solid fa-server"></i>
+                <div style="flex: 1 1 calc(50% - 20px); min-width: 320px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 24px; display: flex; gap: 18px; align-items: flex-start; box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03); box-sizing: border-box;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
+                        &#128421;
                     </div>
                     <div>
-                        <h4 class="rpm-card-title mb-2">2. Agent Node &amp; Multi-Printer Routing</h4>
-                        <p class="rpm-card-text">
+                        <h4 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">2. Agent Node &amp; Multi-Printer Routing</h4>
+                        <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0;">
                             Manage unlimited print stations across multiple locations. Auto-detect printers connected via USB, Network (IP/TCP), or Bluetooth, and map specific Odoo reports to designated printers.
                         </p>
                     </div>
                 </div>
 
                 <!-- Feature 3 -->
-                <div class="rpm-feature-card">
-                    <div class="rpm-icon-box rpm-icon-amber" style="margin-bottom: 0;">
-                        <i class="fa-solid fa-list-check"></i>
+                <div style="flex: 1 1 calc(50% - 20px); min-width: 320px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 24px; display: flex; gap: 18px; align-items: flex-start; box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03); box-sizing: border-box;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
+                        &#128221;
                     </div>
                     <div>
-                        <h4 class="rpm-card-title mb-2">3. Print Job Lifecycle &amp; Queue Control</h4>
-                        <p class="rpm-card-text">
+                        <h4 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">3. Print Job Lifecycle &amp; Queue Control</h4>
+                        <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0;">
                             Track the exact execution state of every print request (Pending &bull; Printing &bull; Done &bull; Error &bull; Cancelled). Detailed error logs allow 1-click reprinting if a printer runs out of paper.
                         </p>
                     </div>
                 </div>
 
                 <!-- Feature 4 -->
-                <div class="rpm-feature-card">
-                    <div class="rpm-icon-box rpm-icon-blue" style="margin-bottom: 0;">
-                        <i class="fa-solid fa-chart-pie"></i>
+                <div style="flex: 1 1 calc(50% - 20px); min-width: 320px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 24px; display: flex; gap: 18px; align-items: flex-start; box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03); box-sizing: border-box;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
+                        &#128200;
                     </div>
                     <div>
-                        <h4 class="rpm-card-title mb-2">4. Live Analytics Dashboard &amp; Dropzone</h4>
-                        <p class="rpm-card-text">
+                        <h4 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">4. Live Analytics Dashboard &amp; Dropzone</h4>
+                        <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0;">
                             Visual health metrics displaying online vs. offline printers, success/failure charts, and an interactive drag-and-drop PDF test tool to verify physical printer output in seconds.
                         </p>
                     </div>
                 </div>
 
                 <!-- Feature 5 -->
-                <div class="rpm-feature-card">
-                    <div class="rpm-icon-box rpm-icon-rose" style="margin-bottom: 0;">
-                        <i class="fa-solid fa-user-shield"></i>
+                <div style="flex: 1 1 calc(50% - 20px); min-width: 320px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 24px; display: flex; gap: 18px; align-items: flex-start; box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03); box-sizing: border-box;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: #ffe4e6; color: #e11d48; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
+                        &#128100;
                     </div>
                     <div>
-                        <h4 class="rpm-card-title mb-2">5. Role-Based Access Control (ACL)</h4>
-                        <p class="rpm-card-text">
+                        <h4 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">5. Role-Based Access Control (ACL)</h4>
+                        <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0;">
                             Granular security access rules. Standard users can execute prints seamlessly, while node setup, printer routing, and token management are restricted to Managers &amp; Administrators.
                         </p>
                     </div>
                 </div>
 
                 <!-- Feature 6 -->
-                <div class="rpm-feature-card">
-                    <div class="rpm-icon-box rpm-icon-purple" style="margin-bottom: 0;">
-                        <i class="fa-solid fa-magnifying-glass-plus"></i>
+                <div style="flex: 1 1 calc(50% - 20px); min-width: 320px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 24px; display: flex; gap: 18px; align-items: flex-start; box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03); box-sizing: border-box;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: #f3e8ff; color: #9333ea; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
+                        &#128269;
                     </div>
                     <div>
-                        <h4 class="rpm-card-title mb-2">6. Optional Preview Dialog Before Printing</h4>
-                        <p class="rpm-card-text">
+                        <h4 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">6. Optional Preview Dialog Before Printing</h4>
+                        <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin: 0;">
                             Configure whether users print silently with 0 clicks, or show an interactive Odoo popup preview to review pages, customize number of copies, or select an alternate printer.
                         </p>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
 
         <!-- ==================== SECTION 3: VIDEO GUIDES & TUTORIALS ==================== -->
-        <section style="margin: 70px 0 50px 0;">
-            <div class="rpm-section-header">
-                <span class="rpm-pretitle"><i class="fa-solid fa-play mr-1"></i> Quick Start &amp; Tutorials</span>
-                <h2 class="rpm-title">Video Demonstrations &amp; Setup Guides</h2>
-                <p class="rpm-subtitle">
+        <div style="margin: 60px 0 40px 0;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <div style="display: inline-block; text-transform: uppercase; font-size: 12px; font-weight: 800; letter-spacing: 1.8px; color: #4f46e5; background: #eef2ff; padding: 6px 16px; border-radius: 9999px; margin-bottom: 12px;">
+                    Quick Start &amp; Tutorials
+                </div>
+                <h2 style="font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 10px 0; letter-spacing: -0.02em;">
+                    Video Demonstrations &amp; Setup Guides
+                </h2>
+                <p style="font-size: 16px; color: #64748b; max-width: 680px; margin: 0 auto;">
                     Watch our step-by-step video guides to quickly understand the direct printing workflow and deploy agent nodes in minutes.
                 </p>
             </div>
 
             <!-- Video Grid (2 Columns: Mobile & Windows Setup) -->
-            <div class="rpm-grid-2">
+            <div style="display: flex; flex-wrap: wrap; gap: 24px; justify-content: center;">
                 <!-- Video 1: Mobile Setup & Demo -->
-                <div style="background: #FFFFFF; padding: 20px; border-radius: var(--rpm-radius-lg); box-shadow: var(--rpm-shadow-card); border: 1px solid var(--rpm-gray-200); display: flex; flex-direction: column;">
+                <div style="flex: 1 1 calc(50% - 24px); min-width: 320px; background: #ffffff; padding: 22px; border-radius: 20px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; box-sizing: border-box;">
                     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
-                        <div style="width: 38px; height: 38px; border-radius: 10px; background: #EEF2FF; color: var(--rpm-primary); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
-                            <i class="fa-solid fa-mobile-screen-button"></i>
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; font-weight: bold;">
+                            &#128241;
                         </div>
                         <div>
-                            <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--rpm-dark); margin: 0 0 2px 0;">1. Mobile Setup &amp; Live Demo</h4>
-                            <p style="font-size: 0.85rem; color: var(--rpm-gray-600); margin: 0;">Step-by-step setup &amp; direct print demo from mobile devices</p>
+                            <h4 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 2px 0;">1. Mobile Setup &amp; Live Demo</h4>
+                            <p style="font-size: 13.5px; color: #64748b; margin: 0;">Step-by-step setup &amp; direct print demo from mobile devices</p>
                         </div>
                     </div>
-                    <a href="https://www.youtube.com/watch?v=GUyYdclg41g" target="_blank" rel="noopener noreferrer" class="rpm-video-thumb" title="Watch Mobile Setup &amp; Live Demo on YouTube">
-                        <img src="https://img.youtube.com/vi/GUyYdclg41g/hqdefault.jpg" alt="Mobile Setup &amp; Live Demo">
-                        <div class="rpm-video-overlay">
-                            <div class="rpm-play-btn">
-                                <i class="fa-solid fa-play" style="margin-left: 4px;"></i>
+                    <a href="https://www.youtube.com/watch?v=GUyYdclg41g" target="_blank" rel="noopener noreferrer" style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; background: #0f172a; display: block; text-decoration: none;">
+                        <img src="https://img.youtube.com/vi/GUyYdclg41g/hqdefault.jpg" alt="Mobile Setup &amp; Live Demo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.35); display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 64px; height: 64px; background: #ff0000; color: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5); border: 3px solid rgba(255, 255, 255, 0.9);">
+                                &#9654;
                             </div>
                         </div>
-                        <span class="rpm-video-badge">
-                            <i class="fa-brands fa-youtube" style="color: #FF0000;"></i> Watch on YouTube
+                        <span style="position: absolute; bottom: 10px; right: 10px; background: rgba(15, 23, 42, 0.9); color: #ffffff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                            &#9654; Watch on YouTube
                         </span>
                     </a>
                 </div>
 
                 <!-- Video 2: Windows Installation & Setup Guide -->
-                <div style="background: #FFFFFF; padding: 20px; border-radius: var(--rpm-radius-lg); box-shadow: var(--rpm-shadow-card); border: 1px solid var(--rpm-gray-200); display: flex; flex-direction: column;">
+                <div style="flex: 1 1 calc(50% - 24px); min-width: 320px; background: #ffffff; padding: 22px; border-radius: 20px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; box-sizing: border-box;">
                     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
-                        <div style="width: 38px; height: 38px; border-radius: 10px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
-                            <i class="fa-brands fa-windows"></i>
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; font-weight: bold;">
+                            &#128187;
                         </div>
                         <div>
-                            <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--rpm-dark); margin: 0 0 2px 0;">2. Windows Setup &amp; Agent Guide</h4>
-                            <p style="font-size: 0.85rem; color: var(--rpm-gray-600); margin: 0;">Step-by-step guide to configure Print Node &amp; run Agent on Windows</p>
+                            <h4 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0 0 2px 0;">2. Windows Setup &amp; Agent Guide</h4>
+                            <p style="font-size: 13.5px; color: #64748b; margin: 0;">Step-by-step guide to configure Print Node &amp; run Agent on Windows</p>
                         </div>
                     </div>
-                    <a href="https://www.youtube.com/watch?v=-rBx7TFCNIQ" target="_blank" rel="noopener noreferrer" class="rpm-video-thumb" title="Watch Windows Setup &amp; Agent Guide on YouTube">
-                        <img src="https://img.youtube.com/vi/-rBx7TFCNIQ/hqdefault.jpg" alt="Windows Setup &amp; Agent Guide">
-                        <div class="rpm-video-overlay">
-                            <div class="rpm-play-btn">
-                                <i class="fa-solid fa-play" style="margin-left: 4px;"></i>
+                    <a href="https://www.youtube.com/watch?v=-rBx7TFCNIQ" target="_blank" rel="noopener noreferrer" style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; background: #0f172a; display: block; text-decoration: none;">
+                        <img src="https://img.youtube.com/vi/-rBx7TFCNIQ/hqdefault.jpg" alt="Windows Setup &amp; Agent Guide" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.35); display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 64px; height: 64px; background: #ff0000; color: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5); border: 3px solid rgba(255, 255, 255, 0.9);">
+                                &#9654;
                             </div>
                         </div>
-                        <span class="rpm-video-badge">
-                            <i class="fa-brands fa-youtube" style="color: #FF0000;"></i> Watch on YouTube
+                        <span style="position: absolute; bottom: 10px; right: 10px; background: rgba(15, 23, 42, 0.9); color: #ffffff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                            &#9654; Watch on YouTube
                         </span>
                     </a>
                 </div>
             </div>
-        </section>
+        </div>
 
 
         <!-- ==================== DEVELOPER PROFILE CARD ==================== -->
-        <section class="rpm-author-card">
-            <div class="rpm-author-info">
-                <div class="rpm-author-avatar">
-                    <i class="fa-solid fa-user-astronaut"></i>
+        <div style="background: #ffffff; border-radius: 24px; border: 1px solid #e2e8f0; padding: 32px 30px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04); margin: 60px 0 30px 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="width: 65px; height: 65px; background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); color: #ffffff; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; box-shadow: 0 8px 18px rgba(79, 70, 229, 0.25); flex-shrink: 0;">
+                    &#128104;&#8205;&#128187;
                 </div>
                 <div>
-                    <h4 style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin-bottom: 4px;">Nguyen Phuc Dinh</h4>
-                    <p style="color: #64748B; font-size: 0.95rem; margin-bottom: 0;">
+                    <h4 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0;">Nguyen Phuc Dinh</h4>
+                    <p style="color: #64748b; font-size: 14.5px; margin: 0;">
                         Official Creator &amp; Maintainer of Remote Print Management for Odoo
                     </p>
                 </div>
             </div>
-            <div class="rpm-author-links">
-                <a href="https://github.com/dinhnguyen888" target="_blank" class="rpm-author-btn rpm-author-btn-gh">
-                    <i class="fa-brands fa-github"></i>
-                    <span>github.com/dinhnguyen888</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                <a href="https://github.com/dinhnguyen888" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none; background: #0f172a; color: #ffffff;">
+                    GitHub: dinhnguyen888
                 </a>
-                <a href="mailto:nguyenphucdinh.hosting@gmail.com" class="rpm-author-btn rpm-author-btn-mail">
-                    <i class="fa-solid fa-envelope"></i>
-                    <span>Email Support</span>
+                <a href="mailto:nguyenphucdinh.hosting@gmail.com" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none; background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe;">
+                    Email Support
                 </a>
             </div>
-        </section>
+        </div>
 
 
         <!-- ==================== SUPPORT & FEEDBACK CALLOUT ==================== -->
-        <section class="rpm-cta">
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%); border-radius: 24px; padding: 50px 30px; color: #ffffff; text-align: center; box-shadow: 0 20px 35px -10px rgba(79, 70, 229, 0.3); border: 1px solid rgba(255, 255, 255, 0.12); margin-top: 40px;">
             <div style="max-width: 720px; margin: 0 auto;">
-                <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; background: rgba(255,255,255,0.12); border-radius: 50%; font-size: 26px; margin-bottom: 20px;">
-                    <i class="fa-solid fa-headset" style="color: #FBBF24;"></i>
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; background: rgba(255,255,255,0.12); border-radius: 50%; font-size: 26px; margin-bottom: 18px;">
+                    &#127911;
                 </div>
-                <h3 style="font-size: 1.9rem; font-weight: 800; margin-bottom: 14px; letter-spacing: -0.02em;">
+                <h3 style="font-size: 26px; font-weight: 800; margin: 0 0 12px 0; color: #ffffff;">
                     Need Help, Custom Hardware Drivers, or Fast Fixes?
                 </h3>
-                <p style="color: #CBD5E1; font-size: 1.05rem; line-height: 1.6; margin-bottom: 30px;">
-                    Have feedback, specialized printer hardware requirements, or need assistance setting up? Reach out directly to <strong>Nguyen Phuc Dinh</strong> for dedicated developer assistance!
+                <p style="color: #cbd5e1; font-size: 16px; line-height: 1.6; margin: 0 0 26px 0;">
+                    Have feedback, specialized printer hardware requirements, or need assistance setting up? Reach out directly to <strong style="color: #ffffff;">Nguyen Phuc Dinh</strong> for dedicated developer assistance!
                 </p>
                 <div>
-                    <a href="mailto:nguyenphucdinh.hosting@gmail.com" class="rpm-btn">
-                        <i class="fa-solid fa-envelope"></i>
-                        <span>Contact Nguyen Phuc Dinh</span>
+                    <a href="mailto:nguyenphucdinh.hosting@gmail.com" style="display: inline-flex; align-items: center; justify-content: center; background: #4f46e5; color: #ffffff; font-weight: 700; font-size: 15px; padding: 13px 32px; border-radius: 12px; text-decoration: none; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);">
+                        Contact Nguyen Phuc Dinh
                     </a>
                 </div>
             </div>
-        </section>
+        </div>
 
     </div>
 </div>
-
-</body>
-</html>
